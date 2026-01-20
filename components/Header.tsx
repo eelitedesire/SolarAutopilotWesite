@@ -23,10 +23,11 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-text-secondary hover:text-primary transition-colors">Features</a>
+            <a href="#ai-features" className="text-text-secondary hover:text-primary transition-colors">AI System</a>
+            <a href="#documentation" className="text-text-secondary hover:text-primary transition-colors">Docs</a>
             <a href="#download" className="text-text-secondary hover:text-primary transition-colors">Download</a>
-            <a href="#tutorials" className="text-text-secondary hover:text-primary transition-colors">Docs</a>
-            <a href="#faq" className="text-text-secondary hover:text-primary transition-colors">Community</a>
-            <a href="https://github.com/solarautopilot" className="text-text-secondary hover:text-primary transition-colors flex items-center space-x-1">
+            <a href="#api-docs" className="text-text-secondary hover:text-primary transition-colors">API</a>
+            <a href="https://github.com/CARBONOZ-RENEWABLES/solarautopilot" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors flex items-center space-x-1">
               <Github size={16} />
               <span>GitHub</span>
             </a>
@@ -54,10 +55,11 @@ export default function Header() {
           <div className="md:hidden py-4 border-t border-gray-800">
             <nav className="flex flex-col space-y-4">
               <a href="#features" className="text-text-secondary hover:text-primary transition-colors">Features</a>
+              <a href="#ai-features" className="text-text-secondary hover:text-primary transition-colors">AI System</a>
+              <a href="#documentation" className="text-text-secondary hover:text-primary transition-colors">Docs</a>
               <a href="#download" className="text-text-secondary hover:text-primary transition-colors">Download</a>
-              <a href="#tutorials" className="text-text-secondary hover:text-primary transition-colors">Docs</a>
-              <a href="#faq" className="text-text-secondary hover:text-primary transition-colors">Community</a>
-              <a href="https://github.com/solarautopilot" className="text-text-secondary hover:text-primary transition-colors flex items-center space-x-1">
+              <a href="#api-docs" className="text-text-secondary hover:text-primary transition-colors">API</a>
+              <a href="https://github.com/CARBONOZ-RENEWABLES/solarautopilot" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors flex items-center space-x-1">
                 <Github size={16} />
                 <span>GitHub</span>
               </a>

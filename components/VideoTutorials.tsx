@@ -7,27 +7,27 @@ const tutorials = [
   {
     title: 'Quick Start Guide',
     duration: '5:32',
-    views: '12.3K',
     rating: 4.9,
-    thumbnail: '/api/placeholder/400/225',
+    videoId: 'I76HPteaZuE',
+    startTime: 6,
     description: 'Get SolarAutopilot running in under 6 minutes. From download to first optimization.',
     topics: ['Installation', 'Configuration', 'First Run']
   },
   {
     title: 'AI Optimization Explained',
     duration: '8:15',
-    views: '8.7K',
     rating: 4.8,
-    thumbnail: '/api/placeholder/400/225',
+    videoId: 'I76HPteaZuE',
+    startTime: 6,
     description: 'Deep dive into how the AI makes decisions and learns your energy patterns.',
     topics: ['AI Algorithm', 'Pattern Learning', 'Decision Making']
   },
   {
     title: 'Advanced Configuration',
     duration: '12:45',
-    views: '5.2K',
     rating: 4.9,
-    thumbnail: '/api/placeholder/400/225',
+    videoId: 'I76HPteaZuE',
+    startTime: 6,
     description: 'Customize SolarAutopilot for complex setups with multiple inverters and batteries.',
     topics: ['Multi-Inverter', 'Custom Rules', 'API Integration']
   }
@@ -88,37 +88,18 @@ export default function VideoTutorials() {
           className="mb-16"
         >
           <div className="bg-dark-secondary rounded-2xl border border-gray-700 overflow-hidden max-w-4xl mx-auto">
-            <div className="relative aspect-video bg-gradient-to-br from-primary/20 to-accent-blue/20 flex items-center justify-center">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/25"
-              >
-                <Play size={32} className="text-dark ml-1" />
-              </motion.button>
-              
-              {/* Video Overlay Info */}
-              <div className="absolute bottom-4 left-4 bg-dark/80 rounded-lg p-3">
-                <h3 className="font-semibold mb-1">Complete Setup Walkthrough</h3>
-                <div className="flex items-center space-x-4 text-sm text-text-secondary">
-                  <span className="flex items-center">
-                    <Clock size={14} className="mr-1" />
-                    15:30
-                  </span>
-                  <span className="flex items-center">
-                    <Users size={14} className="mr-1" />
-                    25.1K views
-                  </span>
-                  <span className="flex items-center">
-                    <Star size={14} className="mr-1 text-yellow-500" />
-                    4.9
-                  </span>
-                </div>
-              </div>
+            <div className="relative aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/I76HPteaZuE?start=6"
+                title="SolarAutopilot Complete Setup Walkthrough"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
             
             <div className="p-6">
-              <h3 className="text-xl font-semibold mb-3">Master SolarAutopilot in 15 Minutes</h3>
+              <h3 className="text-xl font-semibold mb-3">Master SolarAutopilot Setup</h3>
               <p className="text-text-secondary mb-4">
                 Complete walkthrough covering installation, configuration, and optimization. 
                 Perfect for beginners and experienced users alike.
@@ -145,29 +126,20 @@ export default function VideoTutorials() {
               viewport={{ once: true }}
               className="card hover:scale-105 transition-transform duration-300 overflow-hidden"
             >
-              <div className="relative aspect-video bg-gradient-to-br from-gray-800 to-gray-900 mb-4 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    className="w-12 h-12 bg-primary/80 rounded-full flex items-center justify-center"
-                  >
-                    <Play size={20} className="text-dark ml-0.5" />
-                  </motion.button>
-                </div>
-                
-                <div className="absolute top-2 right-2 bg-dark/80 rounded px-2 py-1 text-xs">
-                  {tutorial.duration}
-                </div>
+              <div className="relative aspect-video mb-4 rounded-lg overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${tutorial.videoId}?start=${tutorial.startTime}`}
+                  title={tutorial.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
               
               <h3 className="text-lg font-semibold mb-2">{tutorial.title}</h3>
               <p className="text-text-secondary text-sm mb-3">{tutorial.description}</p>
               
-              <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
-                <span className="flex items-center">
-                  <Users size={12} className="mr-1" />
-                  {tutorial.views}
-                </span>
+              <div className="flex items-center justify-end text-xs text-text-secondary mb-3">
                 <span className="flex items-center">
                   <Star size={12} className="mr-1 text-yellow-500" />
                   {tutorial.rating}

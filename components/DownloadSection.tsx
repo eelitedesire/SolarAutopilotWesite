@@ -7,73 +7,72 @@ const platforms = [
   {
     icon: Monitor,
     name: 'Windows',
-    version: '1.0.0',
+    version: '1.1.0',
     size: '~250 MB',
     requirements: 'Windows 10+',
     downloads: [
-      { label: 'Download .exe', type: 'exe', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-windows.exe' },
-      { label: 'Download .msi', type: 'msi', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-windows.msi' }
+      { label: 'Download .exe (x64)', type: 'exe', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
+      { label: 'Download Portable', type: 'portable', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' }
     ]
   },
   {
     icon: Smartphone,
     name: 'Linux',
-    version: '1.0.0',
-    size: 'Various',
-    requirements: 'Ubuntu 20.04+, Debian 11+',
+    version: '1.1.0',
+    size: '~200 MB',
+    requirements: 'Ubuntu 18.04+, Debian 10+',
     downloads: [
-      { label: 'Download .deb', type: 'deb', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-linux.deb' },
-      { label: 'Download .rpm', type: 'rpm', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-linux.rpm' },
-      { label: 'Download AppImage', type: 'appimage', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-linux.AppImage' }
+      { label: 'Download AppImage', type: 'appimage', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
+      { label: 'Raspberry Pi (ARM64)', type: 'arm', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' }
     ]
   },
   {
     icon: Apple,
     name: 'macOS',
-    version: '1.0.0',
+    version: '1.1.0',
     size: '~200 MB',
-    requirements: 'macOS 11+',
+    requirements: 'macOS 10.13+',
     downloads: [
-      { label: 'Download .dmg', type: 'dmg', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-macos.dmg' },
-      { label: 'Download .pkg', type: 'pkg', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-macos.pkg' }
+      { label: 'Download .dmg (Universal)', type: 'dmg', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
+      { label: 'Installation Guide', type: 'docs', url: '#install-guide' }
     ]
   },
   {
     icon: HardDrive,
-    name: 'Raspberry Pi',
-    version: '1.0.0 (ARM)',
-    size: '~180 MB',
-    requirements: 'Pi 3/4/5',
+    name: 'Home Assistant',
+    version: '1.1.0',
+    size: '~512 MB',
+    requirements: 'HA OS/Supervised',
     downloads: [
-      { label: 'Download ARM', type: 'arm', url: 'https://github.com/solarautopilot/releases/download/v1.0.0/solarautopilot-arm64.tar.gz' },
-      { label: 'Quick Install', type: 'script', url: 'https://get.solarautopilot.com/pi' }
+      { label: 'Add Repository', type: 'addon', url: 'https://github.com/eelitedesire/SolarAutopilotApp' },
+      { label: 'View Guide', type: 'docs', url: '#install-guide' }
     ]
   },
   {
     icon: Container,
     name: 'Docker',
-    version: 'Latest',
+    version: '1.1.0',
     size: '~200 MB',
     requirements: 'Docker 20.10+',
     downloads: [
-      { label: 'Docker Hub', type: 'docker', url: 'https://hub.docker.com/r/solarautopilot/app' },
-      { label: 'View Docs', type: 'docs', url: 'https://docs.solarautopilot.com/docker' }
+      { label: 'Docker Compose', type: 'docker', url: 'https://github.com/eelitedesire/SolarAutopilotApp' },
+      { label: 'View Docs', type: 'docs', url: '#docker-setup' }
     ]
   }
 ]
 
 const installCommands = [
   {
-    title: 'Quick Install (Linux/Mac)',
-    command: 'curl -fsSL https://get.solarautopilot.com | sh'
-  },
-  {
-    title: 'Docker',
-    command: 'docker run -d --name solarautopilot solarautopilot/app'
+    title: 'Home Assistant Add-on',
+    command: 'https://github.com/eelitedesire/SolarAutopilotApp'
   },
   {
     title: 'Docker Compose',
-    command: 'docker-compose up -d'
+    command: 'git clone https://github.com/eelitedesire/SolarAutopilotApp.git && cd SolarAutopilotApp && docker-compose up -d'
+  },
+  {
+    title: 'Desktop App',
+    command: 'Download from GitHub Actions → Universal Builds → Extract → Install'
   }
 ]
 
@@ -92,7 +91,8 @@ export default function DownloadSection() {
             Download <span className="text-primary">SolarAutopilot</span>
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            Choose your platform and start optimizing in minutes. All downloads are free, open source, and require no registration.
+            Choose your platform and start optimizing in minutes. All downloads are free, open source, and require no registration. 
+            Available as desktop apps for Windows, macOS, Linux, and as a Home Assistant add-on.
           </p>
         </motion.div>
 
@@ -178,20 +178,20 @@ export default function DownloadSection() {
           className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 text-center"
         >
           <div>
-            <div className="text-3xl font-bold text-primary mb-2">10K+</div>
-            <div className="text-text-secondary">Downloads</div>
+            <div className="text-3xl font-bold text-primary mb-2">5+</div>
+            <div className="text-text-secondary">Platforms</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-primary mb-2">50+</div>
-            <div className="text-text-secondary">Countries</div>
+            <div className="text-3xl font-bold text-primary mb-2">100%</div>
+            <div className="text-text-secondary">Open Source</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-primary mb-2">1.2M+</div>
-            <div className="text-text-secondary">kWh Optimized</div>
+            <div className="text-3xl font-bold text-primary mb-2">12.7%</div>
+            <div className="text-text-secondary">Cost Savings</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-primary mb-2">★ 4.9</div>
-            <div className="text-text-secondary">GitHub Rating</div>
+            <div className="text-3xl font-bold text-primary mb-2">AI</div>
+            <div className="text-text-secondary">Powered</div>
           </div>
         </motion.div>
       </div>

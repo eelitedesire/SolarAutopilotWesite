@@ -7,32 +7,32 @@ const benefits = [
   {
     icon: Brain,
     title: 'AI-Powered Optimization',
-    description: 'Advanced machine learning algorithms continuously optimize your solar energy production and consumption patterns.'
+    description: 'Advanced machine learning algorithms continuously optimize your solar energy production and consumption patterns across all platforms.'
   },
   {
     icon: TrendingUp,
-    title: 'Maximize Savings',
-    description: 'Reduce energy costs by up to 40% through intelligent energy management and peak-time optimization.'
+    title: 'Cross-Platform Flexibility',
+    description: 'Run on Windows, macOS, Linux, Home Assistant, or Docker. Choose the platform that fits your setup best.'
   },
   {
     icon: Shield,
-    title: 'Grid Independence',
-    description: 'Achieve energy autonomy with smart battery management and backup power during outages.'
+    title: 'Privacy & Security',
+    description: 'All processing happens locally on your hardware. Your energy data never leaves your network, ensuring complete privacy.'
   },
   {
     icon: Zap,
     title: 'Real-Time Monitoring',
-    description: 'Track energy production, consumption, and savings with detailed analytics and live dashboards.'
+    description: 'Track energy production, consumption, and savings with detailed analytics and live dashboards on any device.'
   },
   {
     icon: DollarSign,
-    title: 'ROI Tracking',
-    description: 'Monitor your solar investment returns with comprehensive financial analytics and projections.'
+    title: 'Cost Optimization',
+    description: 'Achieve up to 12.7% cost reduction through intelligent battery charging and dynamic pricing integration.'
   },
   {
     icon: Leaf,
-    title: 'Carbon Footprint',
-    description: 'Track your environmental impact and carbon savings with detailed sustainability metrics.'
+    title: 'CO2 Impact Tracking',
+    description: 'Monitor your environmental impact and carbon savings with integration for marketable CO2 offsets.'
   }
 ]
 

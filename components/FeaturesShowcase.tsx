@@ -1,36 +1,36 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Monitor, BarChart3, Settings, Smartphone } from 'lucide-react'
+import { Monitor, BarChart3, Activity, Smartphone } from 'lucide-react'
 
 const features = [
   {
     title: 'Real-Time Dashboard',
-    description: 'Monitor your solar system performance with live data visualization and comprehensive analytics.',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop&crop=center',
+    description: 'Monitor your solar system with live data visualization and comprehensive analytics for all your energy metrics.',
+    image: '/images/dashboard.png',
     icon: Monitor,
-    stats: ['Live monitoring', '24/7 tracking', 'Custom alerts']
+    stats: ['Live monitoring', 'Data visualization', 'Energy analytics']
   },
   {
-    title: 'Advanced Analytics',
-    description: 'Deep insights into energy production, consumption patterns, and optimization opportunities.',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop&crop=center',
+    title: 'AI Optimization Engine',
+    description: 'Advanced AI learns from your patterns and optimizes battery charging for maximum savings and efficiency.',
+    image: '/images/ai.png',
     icon: BarChart3,
-    stats: ['Predictive analysis', 'ROI tracking', 'Performance reports']
+    stats: ['Smart learning', 'Auto optimization', '12.7% cost savings']
   },
   {
-    title: 'Smart Automation',
-    description: 'AI-powered system that automatically optimizes energy usage based on weather and consumption patterns.',
-    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=500&fit=crop&crop=center',
-    icon: Settings,
-    stats: ['Auto optimization', 'Smart scheduling', 'Load balancing']
+    title: 'Analytics',
+    description: 'Comprehensive energy analytics with historical data spanning 30 days, 12 months, and 10 years. Beautiful interactive charts show your solar production, consumption patterns, and optimization performance.',
+    image: '/images/analytics.png',
+    icon: Activity,
+    stats: ['30 days data', '12 months history', '10 years analytics']
   },
   {
-    title: 'Mobile Control',
-    description: 'Full system control from anywhere with our intuitive mobile app and remote management.',
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=500&fit=crop&crop=center',
+    title: 'Multi-Platform Support',
+    description: 'Available as native desktop apps for Windows, macOS, and Linux, plus a dedicated Home Assistant add-on and Docker container. Choose what works best for your setup.',
+    image: '/images/homeassistant.png',
     icon: Smartphone,
-    stats: ['Remote access', 'Push notifications', 'Voice control']
+    stats: ['Desktop Apps', 'Home Assistant', 'Docker Ready']
   }
 ]
 

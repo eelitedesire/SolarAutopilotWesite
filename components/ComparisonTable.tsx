@@ -4,13 +4,13 @@ import { motion } from 'framer-motion'
 import { Check, X, Star } from 'lucide-react'
 
 const features = [
+  { name: 'Cross-Platform Support', traditional: false, homeAssistant: 'HA Only', solarAutopilot: 'Desktop Apps + HA Add-on' },
   { name: 'AI Optimization', traditional: false, homeAssistant: false, solarAutopilot: true },
+  { name: 'Desktop Application', traditional: false, homeAssistant: false, solarAutopilot: true },
   { name: 'Price-based Charging', traditional: false, homeAssistant: 'manual', solarAutopilot: true },
   { name: 'Learning System', traditional: false, homeAssistant: false, solarAutopilot: true },
   { name: 'Cost Savings', traditional: '0%', homeAssistant: '~5%', solarAutopilot: 'Up to 12.7%' },
   { name: 'Setup Time', traditional: 'Hours', homeAssistant: 'Hours', solarAutopilot: '5 Minutes' },
-  { name: 'Inverter Auto-detection', traditional: false, homeAssistant: false, solarAutopilot: true },
-  { name: 'Academic Research', traditional: false, homeAssistant: false, solarAutopilot: true },
   { name: 'Privacy First', traditional: false, homeAssistant: true, solarAutopilot: true },
 ]
 
@@ -45,7 +45,7 @@ export default function ComparisonTable() {
             <span className="text-primary">SolarAutopilot</span> vs Traditional Systems
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            See how SolarAutopilot compares to traditional solar management approaches and manual Home Assistant setups.
+            See how SolarAutopilot's multi-platform approach compares to traditional solar management and Home Assistant-only solutions.
           </p>
         </motion.div>
 
@@ -102,8 +102,8 @@ export default function ComparisonTable() {
           <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 max-w-2xl mx-auto">
             <h3 className="text-xl font-semibold mb-3 text-primary">Why Choose SolarAutopilot?</h3>
             <p className="text-text-secondary">
-              The only solution that combines academic-backed AI optimization with zero-configuration setup. 
-              Start saving money in minutes, not hours.
+              The only cross-platform solution that combines advanced AI optimization with zero-configuration setup. 
+              Run on any platform - start saving money in minutes, not hours.
             </p>
           </div>
         </motion.div>

@@ -41,14 +41,15 @@ export default function Hero() {
         >
           {/* Main Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Intelligent Solar Energy Management,{' '}
-            <span className="text-primary">Powered by AI</span>
+            AI-Powered Solar Energy Management for{' '}
+            <span className="text-primary">Every Platform</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-text-secondary mb-8 max-w-3xl mx-auto leading-relaxed">
-            Optimize your solar system with academic-backed AI that learns your patterns and saves you money. 
-            Up to <span className="text-primary font-semibold">12.7% cost reduction</span> compared to traditional systems.
+            Cross-platform desktop app with intelligent battery charging optimization using advanced AI. 
+            Available for Windows, macOS, Linux, and as a Home Assistant add-on. Achieve up to{' '}
+            <span className="text-primary font-semibold">12.7% cost reduction</span> with dynamic pricing.
           </p>
 
           {/* CTAs */}
