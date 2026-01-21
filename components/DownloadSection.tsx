@@ -8,7 +8,7 @@ const platforms = [
     icon: Monitor,
     name: 'Windows',
     version: '1.1.0',
-    size: '~250 MB',
+    size: '483 MB',
     requirements: 'Windows 10+',
     downloads: [
       { label: 'Download .exe (x64)', type: 'exe', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
@@ -19,7 +19,7 @@ const platforms = [
     icon: Smartphone,
     name: 'Linux',
     version: '1.1.0',
-    size: '~200 MB',
+    size: '223 MB',
     requirements: 'Ubuntu 18.04+, Debian 10+',
     downloads: [
       { label: 'Download AppImage', type: 'appimage', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
@@ -30,7 +30,7 @@ const platforms = [
     icon: Apple,
     name: 'macOS',
     version: '1.1.0',
-    size: '~200 MB',
+    size: '696 MB',
     requirements: 'macOS 10.13+',
     downloads: [
       { label: 'Download .dmg (Universal)', type: 'dmg', url: 'https://github.com/eelitedesire/SolarAutopilotApp/actions' },
@@ -41,22 +41,11 @@ const platforms = [
     icon: HardDrive,
     name: 'Home Assistant',
     version: '1.1.0',
-    size: '~512 MB',
+    size: '89 MB',
     requirements: 'HA OS/Supervised',
     downloads: [
       { label: 'Add Repository', type: 'addon', url: 'https://github.com/eelitedesire/SolarAutopilotApp' },
       { label: 'View Guide', type: 'docs', url: '#install-guide' }
-    ]
-  },
-  {
-    icon: Container,
-    name: 'Docker',
-    version: '1.1.0',
-    size: '~200 MB',
-    requirements: 'Docker 20.10+',
-    downloads: [
-      { label: 'Docker Compose', type: 'docker', url: 'https://github.com/eelitedesire/SolarAutopilotApp' },
-      { label: 'View Docs', type: 'docs', url: '#docker-setup' }
     ]
   }
 ]
@@ -65,10 +54,6 @@ const installCommands = [
   {
     title: 'Home Assistant Add-on',
     command: 'https://github.com/eelitedesire/SolarAutopilotApp'
-  },
-  {
-    title: 'Docker Compose',
-    command: 'git clone https://github.com/eelitedesire/SolarAutopilotApp.git && cd SolarAutopilotApp && docker-compose up -d'
   },
   {
     title: 'Desktop App',
@@ -91,13 +76,13 @@ export default function DownloadSection() {
             Download <span className="text-primary">SolarAutopilot</span>
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            Choose your platform and start optimizing in minutes. All downloads are free, open source, and require no registration. 
+            Choose your platform and start optimizing in minutes. All downloads are free and require no registration. 
             Available as desktop apps for Windows, macOS, Linux, and as a Home Assistant add-on.
           </p>
         </motion.div>
 
         {/* Platform Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {platforms.map((platform, index) => (
             <motion.div
               key={index}
@@ -154,7 +139,7 @@ export default function DownloadSection() {
         >
           <h3 className="text-2xl font-semibold mb-6 text-center">Quick Installation</h3>
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {installCommands.map((cmd, index) => (
               <div key={index} className="bg-dark rounded-lg p-4 border border-gray-600">
                 <div className="text-sm text-primary font-medium mb-2">{cmd.title}</div>
@@ -175,15 +160,15 @@ export default function DownloadSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 text-center"
+          className="grid grid-cols-2 md:grid-cols-3 gap-8 mt-16 text-center"
         >
           <div>
             <div className="text-3xl font-bold text-primary mb-2">5+</div>
             <div className="text-text-secondary">Platforms</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-primary mb-2">100%</div>
-            <div className="text-text-secondary">Open Source</div>
+            <div className="text-3xl font-bold text-primary mb-2">Free</div>
+            <div className="text-text-secondary">Download</div>
           </div>
           <div>
             <div className="text-3xl font-bold text-primary mb-2">12.7%</div>

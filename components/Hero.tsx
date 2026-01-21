@@ -83,10 +83,6 @@ export default function Hero() {
             className="flex flex-wrap justify-center items-center gap-6 text-text-secondary"
           >
             <div className="flex items-center space-x-2">
-              <Shield size={16} className="text-primary" />
-              <span>Open Source</span>
-            </div>
-            <div className="flex items-center space-x-2">
               <Zap size={16} className="text-primary" />
               <span>No Subscription</span>
             </div>

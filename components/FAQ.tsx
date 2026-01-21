@@ -19,11 +19,11 @@ const faqs = [
   },
   {
     question: 'Is my data sent to the cloud?',
-    answer: 'No! SolarAutopilot runs entirely on your local hardware. All AI processing, optimization decisions, and data storage happen locally. Your energy data never leaves your network, ensuring complete privacy and security.'
+    answer: 'Yes, your energy data is securely transmitted to our CARBONOZ data center at login.carbonoz.com for AI processing, analytics, and CO2 tracking. All data is encrypted in transit and stored securely to provide you with advanced insights and optimization features.'
   },
   {
     question: 'Can I use it commercially?',
-    answer: 'Absolutely! SolarAutopilot is released under the MIT License, which allows commercial use without restrictions. You can use it for your business, modify it, and even redistribute it as part of your own solutions.'
+    answer: 'Yes! SolarAutopilot is a CARBONOZ product that can be downloaded and used freely for both personal and commercial purposes. You can use it to optimize your solar energy systems in residential or business environments.'
   },
   {
     question: "What's the power consumption?",
