@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/config'
+import { prisma } from '@/lib/db/prisma'
+
+export async function GET() {
+  const roadmaps = await prisma.roadmap.findMany({
+    where: { enabled: true },
+    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+  })
+  return NextResponse.json(roadmaps)
+}
+
+export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const data = await req.json()
+  const roadmap = await prisma.roadmap.create({ data })
+  return NextResponse.json(roadmap)
+}
+
+export async function PUT(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id, ...data } = await req.json()
+  const roadmap = await prisma.roadmap.update({ where: { id }, data })
+  return NextResponse.json(roadmap)
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { searchParams } = new URL(req.url)
+  const id = searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
+
+  await prisma.roadmap.delete({ where: { id } })
+  return NextResponse.json({ success: true })
+}

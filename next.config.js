@@ -5,10 +5,8 @@ const nextConfig = {
   generateEtags: false,
   images: {
     unoptimized: true,
+    domains: ['downloads.yourdomain.com'],
   },
-  output: 'export',
-  trailingSlash: true,
-  skipTrailingSlashRedirect: true,
 }
 
 module.exports = nextConfig

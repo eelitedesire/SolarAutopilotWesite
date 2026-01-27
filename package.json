@@ -1,30 +1,42 @@
 {
   "name": "solarautopilot-website",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.974.0",
     "@aws-sdk/s3-request-presigner": "^3.974.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.300.0",
     "next": "^14.2.35",
+    "next-auth": "^4.24.10",
+
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.19.30",
+
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.23",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
     "postcss": "^8.5.6",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3"
   }

@@ -1,7 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Save, Eye, Plus, Trash2, Edit2, Upload } from 'lucide-react'
+import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { Eye } from 'lucide-react'
+import { useState } from 'react'
+import { Save, Plus, Trash2, Edit2, Upload } from 'lucide-react'
 import { 
   HeroContent, HeaderContent, FooterContent, Feature, AIFeature, FAQ, DownloadItem, Benefit, CTAContent, VideoTutorial, FeaturesSectionContent, DownloadSectionContent, AIFeaturesSectionContent, BenefitsSectionContent, HowItWorksContent, TechnicalSpecsContent, InstallationContent, APIDocsContent, CommunityContent, ComparisonContent, UserGuideContent,
   getHeroContent, saveHeroContent,
@@ -28,6 +32,8 @@ import {
 } from '@/lib/admin'
 
 export default function AdminPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('hero')
   const [heroContent, setHeroContent] = useState<HeroContent>({
     title: '', subtitle: '', primaryCTA: '', secondaryCTA: ''
@@ -82,6 +88,92 @@ export default function AdminPage() {
     title: '', subtitle: '', features: [], bottomTitle: '', bottomSubtitle: ''
   })
   const [saved, setSaved] = useState(false)
+  const [dbDownloads, setDbDownloads] = useState([])
+  const [blogPosts, setBlogPosts] = useState([])
+  const [changelogs, setChangelogs] = useState([])
+  const [roadmaps, setRoadmaps] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [editingBlog, setEditingBlog] = useState<any>(null)
+  const [editingChangelog, setEditingChangelog] = useState<any>(null)
+  const [editingRoadmap, setEditingRoadmap] = useState<any>(null)
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/admin/login')
+    }
+  }, [status, router])
+
+  useEffect(() => {
+    if (activeTab === 'dbDownloads' || activeTab === 'downloads') fetchDbDownloads()
+    if (activeTab === 'blog') fetchBlogPosts()
+    if (activeTab === 'changelog') fetchChangelogs()
+    if (activeTab === 'roadmap') fetchRoadmaps()
+  }, [activeTab])
+
+  const fetchDbDownloads = async () => {
+    const res = await fetch('/api/downloads')
+    const data = await res.json()
+    setDbDownloads(data)
+  }
+
+  const fetchBlogPosts = async () => {
+    const res = await fetch('/api/blog')
+    const data = await res.json()
+    setBlogPosts(data)
+  }
+
+  const fetchChangelogs = async () => {
+    const res = await fetch('/api/changelog')
+    const data = await res.json()
+    setChangelogs(data)
+  }
+
+  const fetchRoadmaps = async () => {
+    const res = await fetch('/api/roadmap')
+    const data = await res.json()
+    setRoadmaps(data)
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const platform = prompt('Platform (windows/macos/linux):')
+    const version = prompt('Version (e.g., 2.1.0):')
+    const checksum = prompt('Checksum (optional):')
+
+    if (!platform || !version) return
+
+    setUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('platform', platform)
+    formData.append('version', version)
+    if (checksum) formData.append('checksum', checksum)
+
+    await fetch('/api/downloads', {
+      method: 'POST',
+      body: formData,
+    })
+
+    setUploading(false)
+    fetchDbDownloads()
+  }
+
+  const toggleDbDownload = async (id: string, enabled: boolean) => {
+    await fetch('/api/downloads', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, enabled: !enabled }),
+    })
+    fetchDbDownloads()
+  }
+
+  const deleteDbDownload = async (id: string) => {
+    if (!confirm('Delete this download?')) return
+    await fetch(`/api/downloads?id=${id}`, { method: 'DELETE' })
+    fetchDbDownloads()
+  }
 
   useEffect(() => {
     setHeroContent(getHeroContent())
@@ -153,14 +245,29 @@ export default function AdminPage() {
     setFeatures(features.map(f => f.id === id ? { ...f, ...updates } : f))
   }
 
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!session) return null
+
   return (
     <div className="min-h-screen bg-dark text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-primary">Admin Panel</h1>
-          <a href="/" className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors">
-            <Eye size={20} /> View Site
-          </a>
+          <div className="flex gap-4">
+            <a href="/" className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors">
+              <Eye size={20} /> View Site
+            </a>
+            <button onClick={() => router.push('/api/auth/signout')} className="text-text-secondary hover:text-white transition-colors">
+              Sign Out
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -182,7 +289,11 @@ export default function AdminPage() {
             {id: 'community', label: 'Community'},
             {id: 'comparison', label: 'Comparison'},
             {id: 'cta', label: 'Final CTA'},
-            {id: 'videos', label: 'Video Tutorials'}
+            {id: 'videos', label: 'Video Tutorials'},
+            {id: 'dbDownloads', label: 'File Manager'},
+            {id: 'blog', label: 'Blog'},
+            {id: 'changelog', label: 'Changelog'},
+            {id: 'roadmap', label: 'Roadmap'}
           ].map(tab => (
             <button
               key={tab.id}
@@ -996,27 +1107,16 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* Downloads Tab */}
+        {/* Downloads Tab - Connected to File Manager */}
         {activeTab === 'downloads' && (
           <div className="bg-dark-secondary rounded-lg p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-primary">Downloads</h2>
-              <button onClick={() => {
-                const newDownload: DownloadItem = {
-                  id: Date.now().toString(),
-                  platform: 'New Platform',
-                  version: '1.0.0',
-                  url: '#',
-                  size: '0MB',
-                  enabled: true
-                }
-                setDownloads([...downloads, newDownload])
-              }} className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark">
-                <Plus size={18} /> Add Download
+              <h2 className="text-xl font-semibold text-primary">Downloads (Connected to File Manager)</h2>
+              <button onClick={() => setActiveTab('dbDownloads')} className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark">
+                <Upload size={18} /> Go to File Manager
               </button>
             </div>
             
-            {/* Section Header */}
             <div className="border border-gray-600 rounded-lg p-4 mb-6">
               <h3 className="text-lg font-medium mb-4 text-white">Section Header</h3>
               <div className="space-y-4">
@@ -1037,64 +1137,32 @@ export default function AdminPage() {
               </div>
             </div>
             
-            <div className="space-y-6">
-              {downloads.map((download) => (
-                <div key={download.id} className="border border-gray-600 rounded-lg p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <input
-                      type="text"
-                      value={download.platform}
-                      onChange={(e) => setDownloads(downloads.map(d => d.id === download.id ? { ...d, platform: e.target.value } : d))}
-                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
-                      placeholder="Platform"
-                    />
-                    <input
-                      type="text"
-                      value={download.version}
-                      onChange={(e) => setDownloads(downloads.map(d => d.id === download.id ? { ...d, version: e.target.value } : d))}
-                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
-                      placeholder="Version"
-                    />
-                    <input
-                      type="text"
-                      value={download.size}
-                      onChange={(e) => setDownloads(downloads.map(d => d.id === download.id ? { ...d, size: e.target.value } : d))}
-                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
-                      placeholder="Size"
-                    />
-                    <input
-                      type="text"
-                      value={download.url}
-                      onChange={(e) => setDownloads(downloads.map(d => d.id === download.id ? { ...d, url: e.target.value } : d))}
-                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
-                      placeholder="Download URL"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={download.enabled}
-                        onChange={(e) => setDownloads(downloads.map(d => d.id === download.id ? { ...d, enabled: e.target.checked } : d))}
-                        className="w-4 h-4 text-primary bg-dark border-gray-600 rounded focus:ring-primary"
-                      />
-                      <span className="text-text-secondary">Enabled</span>
-                    </label>
-                    <button
-                      onClick={() => setDownloads(downloads.filter(d => d.id !== download.id))}
-                      className="flex items-center gap-2 text-red-400 hover:text-red-300"
-                    >
-                      <Trash2 size={16} /> Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button onClick={() => { saveDownloads(downloads); saveDownloadSectionContent(downloadSection); showSaved(); }} className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                saved ? 'bg-green-600 text-white' : 'bg-primary text-dark hover:bg-primary-dark'
-              }`}>
-                <Save size={18} /> {saved ? 'Saved!' : 'Save Downloads'}
-              </button>
+            <div className="bg-dark border border-gray-600 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-medium mb-4 text-white">Files from Database ({dbDownloads.length})</h3>
+              <div className="space-y-3">
+                {dbDownloads.length === 0 ? (
+                  <p className="text-text-secondary text-center py-8">No files uploaded yet. Go to File Manager to upload files.</p>
+                ) : (
+                  dbDownloads.map((file: any) => (
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-dark-secondary rounded border border-gray-700">
+                      <div>
+                        <p className="font-medium">{file.platform} v{file.version}</p>
+                        <p className="text-sm text-text-secondary">{file.filename} - {file.size}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded text-xs ${file.enabled ? 'bg-green-600' : 'bg-gray-600'}`}>
+                        {file.enabled ? 'Active' : 'Disabled'}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
+            
+            <button onClick={() => { saveDownloadSectionContent(downloadSection); showSaved(); }} className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+              saved ? 'bg-green-600 text-white' : 'bg-primary text-dark hover:bg-primary-dark'
+            }`}>
+              <Save size={18} /> {saved ? 'Saved!' : 'Save Section Content'}
+            </button>
           </div>
         )}
 
@@ -2384,6 +2452,431 @@ export default function AdminPage() {
               }`}>
                 <Save size={18} /> {saved ? 'Saved!' : 'Save Comparison'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* File Manager Tab */}
+        {activeTab === 'dbDownloads' && (
+          <div className="bg-dark-secondary rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-primary">File Manager</h2>
+              <label className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark cursor-pointer">
+                <Upload size={18} />
+                <span>{uploading ? 'Uploading...' : 'Upload File'}</span>
+                <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+              </label>
+            </div>
+            
+            {dbDownloads.length === 0 && (
+              <div className="border border-primary/30 bg-primary/5 rounded-lg p-6 mb-6">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Upload size={20} className="text-primary" />
+                  How to Add Downloads to Website
+                </h3>
+                <ol className="space-y-2 text-text-secondary text-sm">
+                  <li className="flex gap-2"><span className="text-primary font-bold">1.</span> Click "Upload File" button above</li>
+                  <li className="flex gap-2"><span className="text-primary font-bold">2.</span> Enter platform name (e.g., Windows x64, macOS, Linux, Home Assistant)</li>
+                  <li className="flex gap-2"><span className="text-primary font-bold">3.</span> Enter version number (e.g., 2.1.0)</li>
+                  <li className="flex gap-2"><span className="text-primary font-bold">4.</span> Optionally add checksum for security verification</li>
+                  <li className="flex gap-2"><span className="text-primary font-bold">5.</span> Select installer file from your computer</li>
+                  <li className="flex gap-2"><span className="text-primary font-bold">6.</span> File will be uploaded and instantly appear on homepage</li>
+                </ol>
+                <p className="text-primary text-sm mt-4 font-medium">💡 Tip: Enable/disable files anytime without deleting them</p>
+              </div>
+            )}
+            
+            <div className="space-y-4">
+              {dbDownloads.map((download: any) => (
+                <div key={download.id} className="border border-gray-600 rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg">{download.platform} - v{download.version}</h3>
+                    <p className="text-text-secondary text-sm">{download.filename} ({download.size})</p>
+                    <p className="text-xs text-text-secondary mt-1">Downloads: {download.downloads}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => toggleDbDownload(download.id, download.enabled)}
+                      className={`px-4 py-2 rounded ${download.enabled ? 'bg-green-600' : 'bg-gray-600'}`}
+                    >
+                      {download.enabled ? 'Enabled' : 'Disabled'}
+                    </button>
+                    <button onClick={() => deleteDbDownload(download.id)} className="text-red-400 hover:text-red-300 p-2">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Blog Tab */}
+        {activeTab === 'blog' && (
+          <div className="bg-dark-secondary rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-primary">Blog Posts</h2>
+              <button onClick={() => setEditingBlog({ title: '', slug: '', excerpt: '', content: '', tags: [], published: false })} className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark">
+                <Plus size={18} /> New Post
+              </button>
+            </div>
+            
+            {editingBlog ? (
+              <div className="border border-gray-600 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-medium mb-4 text-white">{editingBlog.id ? 'Edit Post' : 'New Post'}</h3>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={editingBlog.title}
+                    onChange={(e) => setEditingBlog({...editingBlog, title: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Post title"
+                  />
+                  <input
+                    type="text"
+                    value={editingBlog.slug}
+                    onChange={(e) => setEditingBlog({...editingBlog, slug: e.target.value})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Slug (URL-friendly)"
+                  />
+                  <textarea
+                    value={editingBlog.excerpt}
+                    onChange={(e) => setEditingBlog({...editingBlog, excerpt: e.target.value})}
+                    rows={2}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none resize-none"
+                    placeholder="Short excerpt"
+                  />
+                  <textarea
+                    value={editingBlog.content}
+                    onChange={(e) => setEditingBlog({...editingBlog, content: e.target.value})}
+                    rows={10}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none resize-none font-mono text-sm"
+                    placeholder="Content (Markdown supported)"
+                  />
+                  <input
+                    type="text"
+                    value={editingBlog.coverImage || ''}
+                    onChange={(e) => setEditingBlog({...editingBlog, coverImage: e.target.value})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Cover image URL (optional)"
+                  />
+                  <input
+                    type="text"
+                    value={Array.isArray(editingBlog.tags) ? editingBlog.tags.join(', ') : ''}
+                    onChange={(e) => setEditingBlog({...editingBlog, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Tags (comma-separated)"
+                  />
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={editingBlog.published}
+                      onChange={(e) => setEditingBlog({...editingBlog, published: e.target.checked})}
+                      className="w-4 h-4 text-primary bg-dark border-gray-600 rounded focus:ring-primary"
+                    />
+                    <span className="text-white">Publish immediately</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <button onClick={async () => {
+                      const method = editingBlog.id ? 'PUT' : 'POST'
+                      await fetch('/api/blog', {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(editingBlog)
+                      })
+                      setEditingBlog(null)
+                      fetchBlogPosts()
+                      showSaved()
+                    }} className="flex items-center gap-2 bg-primary text-dark px-6 py-3 rounded-lg hover:bg-primary-dark">
+                      <Save size={18} /> {editingBlog.id ? 'Update' : 'Create'} Post
+                    </button>
+                    <button onClick={() => setEditingBlog(null)} className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            
+            <div className="space-y-4">
+              {blogPosts.map((post: any) => (
+                <div key={post.id} className="border border-gray-600 rounded-lg p-4 hover:border-primary transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-white">{post.title}</h3>
+                      <p className="text-text-secondary text-sm mt-1">{post.excerpt}</p>
+                      <div className="flex gap-2 mt-3">
+                        <span className={`px-2 py-1 rounded text-xs ${post.published ? 'bg-green-600' : 'bg-gray-600'}`}>
+                          {post.published ? 'Published' : 'Draft'}
+                        </span>
+                        {post.tags?.map((tag: string) => (
+                          <span key={tag} className="px-2 py-1 bg-primary/20 text-primary rounded text-xs">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingBlog(post)} className="text-text-secondary hover:text-white p-2">
+                        <Edit2 size={18} />
+                      </button>
+                      <button onClick={async () => {
+                        if (confirm('Delete this post?')) {
+                          await fetch(`/api/blog?id=${post.id}`, { method: 'DELETE' })
+                          fetchBlogPosts()
+                        }
+                      }} className="text-red-400 hover:text-red-300 p-2">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Changelog Tab */}
+        {activeTab === 'changelog' && (
+          <div className="bg-dark-secondary rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-primary">Changelog</h2>
+              <button onClick={() => setEditingChangelog({ version: '', title: '', releaseDate: new Date().toISOString().split('T')[0], type: 'feature', changes: [] })} className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark">
+                <Plus size={18} /> New Entry
+              </button>
+            </div>
+            
+            {editingChangelog ? (
+              <div className="border border-gray-600 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-medium mb-4 text-white">{editingChangelog.id ? 'Edit Entry' : 'New Entry'}</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      value={editingChangelog.version}
+                      onChange={(e) => setEditingChangelog({...editingChangelog, version: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                      placeholder="Version (e.g., 2.1.0)"
+                    />
+                    <input
+                      type="date"
+                      value={editingChangelog.releaseDate}
+                      onChange={(e) => setEditingChangelog({...editingChangelog, releaseDate: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={editingChangelog.title}
+                    onChange={(e) => setEditingChangelog({...editingChangelog, title: e.target.value})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Release title"
+                  />
+                  <select
+                    value={editingChangelog.type}
+                    onChange={(e) => setEditingChangelog({...editingChangelog, type: e.target.value})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                  >
+                    <option value="feature">Feature</option>
+                    <option value="bugfix">Bug Fix</option>
+                    <option value="security">Security</option>
+                    <option value="performance">Performance</option>
+                  </select>
+                  <textarea
+                    value={Array.isArray(editingChangelog.changes) ? editingChangelog.changes.join('\n') : ''}
+                    onChange={(e) => setEditingChangelog({...editingChangelog, changes: e.target.value.split('\n').filter(Boolean)})}
+                    rows={6}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none resize-none font-mono text-sm"
+                    placeholder="Changes (one per line)"
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={async () => {
+                      const method = editingChangelog.id ? 'PUT' : 'POST'
+                      await fetch('/api/changelog', {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(editingChangelog)
+                      })
+                      setEditingChangelog(null)
+                      fetchChangelogs()
+                      showSaved()
+                    }} className="flex items-center gap-2 bg-primary text-dark px-6 py-3 rounded-lg hover:bg-primary-dark">
+                      <Save size={18} /> {editingChangelog.id ? 'Update' : 'Create'} Entry
+                    </button>
+                    <button onClick={() => setEditingChangelog(null)} className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            
+            <div className="space-y-4">
+              {changelogs.map((log: any) => (
+                <div key={log.id} className="border border-gray-600 rounded-lg p-4 hover:border-primary transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold text-lg text-white">{log.version}</h3>
+                        <span className="px-3 py-1 bg-primary/20 text-primary rounded text-xs">{log.type}</span>
+                      </div>
+                      <p className="text-white font-medium">{log.title}</p>
+                      <p className="text-text-secondary text-sm mt-1">{new Date(log.releaseDate).toLocaleDateString()}</p>
+                      {log.changes && log.changes.length > 0 && (
+                        <ul className="mt-3 space-y-1">
+                          {log.changes.slice(0, 3).map((change: string, i: number) => (
+                            <li key={i} className="text-text-secondary text-sm">• {change}</li>
+                          ))}
+                          {log.changes.length > 3 && <li className="text-text-secondary text-sm">• +{log.changes.length - 3} more...</li>}
+                        </ul>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingChangelog(log)} className="text-text-secondary hover:text-white p-2">
+                        <Edit2 size={18} />
+                      </button>
+                      <button onClick={async () => {
+                        if (confirm('Delete this changelog entry?')) {
+                          await fetch(`/api/changelog?id=${log.id}`, { method: 'DELETE' })
+                          fetchChangelogs()
+                        }
+                      }} className="text-red-400 hover:text-red-300 p-2">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Roadmap Tab */}
+        {activeTab === 'roadmap' && (
+          <div className="bg-dark-secondary rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-primary">Roadmap</h2>
+              <button onClick={() => setEditingRoadmap({ title: '', description: '', status: 'planned', priority: 'medium', category: 'feature', targetDate: '' })} className="flex items-center gap-2 bg-primary text-dark px-4 py-2 rounded-lg hover:bg-primary-dark">
+                <Plus size={18} /> New Item
+              </button>
+            </div>
+            
+            {editingRoadmap ? (
+              <div className="border border-gray-600 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-medium mb-4 text-white">{editingRoadmap.id ? 'Edit Item' : 'New Item'}</h3>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={editingRoadmap.title}
+                    onChange={(e) => setEditingRoadmap({...editingRoadmap, title: e.target.value})}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    placeholder="Feature title"
+                  />
+                  <textarea
+                    value={editingRoadmap.description}
+                    onChange={(e) => setEditingRoadmap({...editingRoadmap, description: e.target.value})}
+                    rows={3}
+                    className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none resize-none"
+                    placeholder="Description"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <select
+                      value={editingRoadmap.status}
+                      onChange={(e) => setEditingRoadmap({...editingRoadmap, status: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    >
+                      <option value="planned">Planned</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select
+                      value={editingRoadmap.priority}
+                      onChange={(e) => setEditingRoadmap({...editingRoadmap, priority: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    >
+                      <option value="low">Low Priority</option>
+                      <option value="medium">Medium Priority</option>
+                      <option value="high">High Priority</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <select
+                      value={editingRoadmap.category}
+                      onChange={(e) => setEditingRoadmap({...editingRoadmap, category: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                    >
+                      <option value="feature">Feature</option>
+                      <option value="improvement">Improvement</option>
+                      <option value="bugfix">Bug Fix</option>
+                      <option value="integration">Integration</option>
+                    </select>
+                    <input
+                      type="date"
+                      value={editingRoadmap.targetDate || ''}
+                      onChange={(e) => setEditingRoadmap({...editingRoadmap, targetDate: e.target.value})}
+                      className="w-full p-3 bg-dark border border-gray-600 rounded-lg text-white focus:border-primary focus:outline-none"
+                      placeholder="Target date (optional)"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={async () => {
+                      const method = editingRoadmap.id ? 'PUT' : 'POST'
+                      await fetch('/api/roadmap', {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(editingRoadmap)
+                      })
+                      setEditingRoadmap(null)
+                      fetchRoadmaps()
+                      showSaved()
+                    }} className="flex items-center gap-2 bg-primary text-dark px-6 py-3 rounded-lg hover:bg-primary-dark">
+                      <Save size={18} /> {editingRoadmap.id ? 'Update' : 'Create'} Item
+                    </button>
+                    <button onClick={() => setEditingRoadmap(null)} className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {['planned', 'in-progress', 'completed'].map(status => (
+                <div key={status} className="border border-gray-600 rounded-lg p-4">
+                  <h3 className="font-semibold text-white mb-4 capitalize">{status.replace('-', ' ')}</h3>
+                  <div className="space-y-3">
+                    {roadmaps.filter((item: any) => item.status === status).map((item: any) => (
+                      <div key={item.id} className="bg-dark border border-gray-700 rounded-lg p-3 hover:border-primary transition-colors">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-medium text-white text-sm">{item.title}</h4>
+                          <div className="flex gap-1">
+                            <button onClick={() => setEditingRoadmap(item)} className="text-text-secondary hover:text-white p-1">
+                              <Edit2 size={14} />
+                            </button>
+                            <button onClick={async () => {
+                              if (confirm('Delete this roadmap item?')) {
+                                await fetch(`/api/roadmap?id=${item.id}`, { method: 'DELETE' })
+                                fetchRoadmaps()
+                              }
+                            }} className="text-red-400 hover:text-red-300 p-1">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-text-secondary text-xs mb-2">{item.description}</p>
+                        <div className="flex gap-2">
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            item.priority === 'critical' ? 'bg-red-600' :
+                            item.priority === 'high' ? 'bg-orange-600' :
+                            item.priority === 'medium' ? 'bg-yellow-600' : 'bg-gray-600'
+                          }`}>{item.priority}</span>
+                          <span className="px-2 py-1 bg-primary/20 text-primary rounded text-xs">{item.category}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

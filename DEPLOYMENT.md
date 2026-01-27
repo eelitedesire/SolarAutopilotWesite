@@ -1,391 +1,248 @@
-# 🚀 SolarAutopilot Website - Ready to Deploy!
+# Deployment Guide - SolarAutopilot Website with Nginx
 
-## ✨ What's Been Created
+## Prerequisites
+- Ubuntu/Debian server with root access
+- Domain name pointing to your server IP
+- Node.js 18+ installed
+- PostgreSQL installed
 
-Your SolarAutopilot website has been completely transformed into a **professional, Grafana-style platform** with comprehensive documentation and advanced features.
+## Step 1: Install Required Software
 
-## 📦 New Components (8 Total)
-
-### 1. **AIFeatures.tsx** ⭐
-Complete AI system showcase with:
-- Solar forecasting (85%+ accuracy)
-- Load prediction (90%+ accuracy)  
-- Charging optimization (12.7% savings)
-- Pattern detection
-- Learning phases
-- Performance metrics
-- Academic foundation
-
-### 2. **TechnicalSpecs.tsx** 🔧
-Technical documentation including:
-- Technology stack (Node.js, React, InfluxDB, etc.)
-- System requirements (Min/Recommended/Optimal)
-- Supported inverters (6 brands)
-- System architecture (6 layers)
-- Network ports
-
-### 3. **Documentation.tsx** 📚
-Documentation hub with 8 categories:
-- Getting Started
-- API Reference
-- AI System
-- Data & Analytics
-- Integrations
-- Security
-- CLI Tools
-- Advanced
-
-### 4. **UserGuide.tsx** 📖
-Complete user guide with 8 sections:
-- Getting Started
-- System Configuration
-- Tibber Integration
-- AI System Setup
-- Data Management
-- Notifications & Alerts
-- Optimization Strategies
-- Security & Backup
-
-### 5. **InstallationGuide.tsx** 💿
-Platform-specific installation:
-- Home Assistant Add-on
-- Docker Deployment
-- Desktop Applications
-- Manual Installation
-
-### 6. **APIDocumentation.tsx** 🔌
-Complete API reference:
-- REST API endpoints
-- MQTT topics
-- WebSocket connections
-- Authentication
-
-### 7. **Community.tsx** 👥
-Community and support:
-- GitHub, Discord, Email
-- Contribution ways
-- Community resources
-- Support channels
-
-### 8. **Updated Components** 🔄
-- DownloadSection.tsx (Real download links)
-- Header.tsx (New navigation)
-- Hero.tsx (Better messaging)
-- FeaturesShowcase.tsx (Actual features)
-
-## 📊 Website Structure
-
-```
-19 Total Sections:
-├── Header (Navigation)
-├── Hero (Landing)
-├── Features Showcase
-├── AI Features ⭐ NEW
-├── Benefits
-├── How It Works
-├── Technical Specs ⭐ NEW
-├── Video Tutorials
-├── Documentation ⭐ NEW
-├── User Guide ⭐ NEW
-├── Installation Guide ⭐ NEW
-├── Download Section (Updated)
-├── API Documentation ⭐ NEW
-├── Community ⭐ NEW
-├── Comparison Table
-├── Pricing Section
-├── FAQ
-├── Final CTA
-└── Footer
-```
-
-## 🎯 Key Features
-
-### ✅ Based on Real App
-- AI-powered optimization (12.7% cost savings)
-- Home Assistant integration
-- Tibber dynamic pricing
-- InfluxDB + Grafana
-- MQTT support
-- Multi-inverter support
-- Desktop apps (Win/Mac/Linux)
-- Docker deployment
-
-### ✅ Comprehensive Documentation
-- 50+ documentation pages
-- 30+ code examples
-- 15+ API endpoints
-- 6+ MQTT topics
-- 4 installation methods
-- 8 user guide sections
-
-### ✅ Professional Design
-- Grafana-inspired dark theme
-- Golden accent color (#DEAF0B)
-- Smooth animations (Framer Motion)
-- Fully responsive
-- Mobile-first approach
-
-## 🚀 Quick Start
-
-### 1. Install Dependencies
 ```bash
-cd SolarAutopilotWesite
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Node.js 18
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Nginx
+sudo apt install -y nginx
+
+# Install PostgreSQL
+sudo apt install -y postgresql postgresql-contrib
+
+# Install Certbot for SSL
+sudo apt install -y certbot python3-certbot-nginx
+```
+
+## Step 2: Setup PostgreSQL Database
+
+```bash
+# Switch to postgres user
+sudo -u postgres psql
+
+# Create database and user
+CREATE DATABASE solarautopilot;
+CREATE USER solarautopilot WITH PASSWORD 'your-secure-password';
+GRANT ALL PRIVILEGES ON DATABASE solarautopilot TO solarautopilot;
+\q
+```
+
+## Step 3: Deploy Application
+
+```bash
+# Create directory
+sudo mkdir -p /var/www/solarautopilot
+cd /var/www/solarautopilot
+
+# Clone or upload your project files here
+# Then:
+
+# Install dependencies
 npm install
-```
 
-### 2. Run Development Server
-```bash
-npm run dev
-```
+# Copy production environment file
+cp .env.production .env.local
 
-Visit: **http://localhost:3000**
+# Edit environment variables
+nano .env.local
+# Update:
+# - DATABASE_URL with your PostgreSQL credentials
+# - ADMIN_PASSWORD with secure password
+# - NEXTAUTH_SECRET (generate with: openssl rand -base64 32)
+# - NEXTAUTH_URL with your domain
+# - NEXT_PUBLIC_SITE_URL with your domain
 
-### 3. Build for Production
-```bash
+# Run Prisma migrations
+npx prisma generate
+npx prisma db push
+
+# Build the application
 npm run build
+
+# Test the build
 npm start
+# Press Ctrl+C to stop
 ```
 
-## 📱 Test Checklist
+## Step 4: Setup Systemd Service
 
-Before deploying, test these sections:
-
-- [ ] Hero section loads with animations
-- [ ] Navigation menu works (desktop & mobile)
-- [ ] All sections scroll smoothly
-- [ ] AI Features displays correctly
-- [ ] Technical Specs shows all data
-- [ ] Documentation links work
-- [ ] User Guide is readable
-- [ ] Installation Guide tabs work
-- [ ] Download buttons are clickable
-- [ ] API Documentation tabs switch
-- [ ] Community links work
-- [ ] Footer displays correctly
-- [ ] Mobile responsive (test on phone)
-
-## 🌐 Deployment Options
-
-### Option 1: Vercel (Recommended)
 ```bash
-npm install -g vercel
-vercel deploy
+# Copy service file
+sudo cp solarautopilot.service /etc/systemd/system/
+
+# Edit service file if needed
+sudo nano /etc/systemd/system/solarautopilot.service
+# Update User and WorkingDirectory if different
+
+# Set correct permissions
+sudo chown -R www-data:www-data /var/www/solarautopilot
+
+# Reload systemd
+sudo systemctl daemon-reload
+
+# Enable and start service
+sudo systemctl enable solarautopilot
+sudo systemctl start solarautopilot
+
+# Check status
+sudo systemctl status solarautopilot
 ```
 
-**Pros**: 
-- Free hosting
-- Automatic SSL
-- Global CDN
-- Easy setup
+## Step 5: Configure Nginx
 
-### Option 2: Netlify
 ```bash
-npm run build
-# Upload .next folder to Netlify
+# Copy nginx config
+sudo cp nginx.conf /etc/nginx/sites-available/solarautopilot
+
+# Edit config with your domain
+sudo nano /etc/nginx/sites-available/solarautopilot
+# Replace 'yourdomain.com' with your actual domain
+
+# Create symbolic link
+sudo ln -s /etc/nginx/sites-available/solarautopilot /etc/nginx/sites-enabled/
+
+# Remove default site
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test nginx config
+sudo nginx -t
+
+# Restart nginx
+sudo systemctl restart nginx
 ```
 
-**Pros**:
-- Free hosting
-- Continuous deployment
-- Form handling
+## Step 6: Setup SSL Certificate
 
-### Option 3: Docker
 ```bash
-# Build image
-docker build -t solarautopilot-website .
+# Get SSL certificate from Let's Encrypt
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
 
-# Run container
-docker run -p 3000:3000 solarautopilot-website
+# Follow prompts and select redirect HTTP to HTTPS
+
+# Test auto-renewal
+sudo certbot renew --dry-run
 ```
 
-**Pros**:
-- Self-hosted
-- Full control
-- Portable
+## Step 7: Configure Firewall
 
-### Option 4: Static Export
 ```bash
-# Add to next.config.js:
-# output: 'export'
-
-npm run build
-# Deploy 'out' folder to any static host
+# Allow SSH, HTTP, HTTPS
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
 ```
 
-**Pros**:
-- Works anywhere
-- Very fast
-- No server needed
+## Step 8: Verify Deployment
 
-## 🔧 Customization Guide
+Visit your domain:
+- https://yourdomain.com - Main website
+- https://yourdomain.com/admin/login - Admin panel
 
-### Update Download Links
-Edit `components/DownloadSection.tsx`:
-```typescript
-downloads: [
-  { 
-    label: 'Download .exe (x64)', 
-    url: 'YOUR_ACTUAL_DOWNLOAD_URL' 
-  }
-]
-```
+Login with credentials from .env.local
 
-### Change Colors
-Edit `tailwind.config.js`:
-```javascript
-colors: {
-  primary: '#DEAF0B',  // Your color
-}
-```
+## Maintenance Commands
 
-### Update Content
-Each component has content arrays at the top:
-```typescript
-const features = [
-  {
-    title: 'Your Title',
-    description: 'Your description'
-  }
-]
-```
-
-## 📝 Documentation Files
-
-Created for you:
-- ✅ **README.md** - Complete website documentation
-- ✅ **QUICKSTART.md** - Quick start guide
-- ✅ **CHANGELOG.md** - All changes documented
-- ✅ **DEPLOYMENT.md** - This file
-
-## 🎨 Design System
-
-### Colors
-```
-Primary: #DEAF0B (Golden)
-Dark: #1A1A1A (Background)
-Text: #FFFFFF (Primary)
-Text Secondary: #A0A0A0
-```
-
-### Typography
-```
-Font: Inter (Google Fonts)
-Headings: Bold, 2xl-5xl
-Body: Regular, base-xl
-```
-
-### Spacing
-```
-Section Padding: py-16 md:py-24
-Container: max-w-7xl mx-auto
-Gap: 6-8 (1.5rem-2rem)
-```
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
 ```bash
-lsof -ti:3000 | xargs kill -9
-npm run dev -- -p 3001
-```
+# View logs
+sudo journalctl -u solarautopilot -f
 
-### Build Errors
-```bash
-rm -rf node_modules .next
+# Restart service
+sudo systemctl restart solarautopilot
+
+# Update application
+cd /var/www/solarautopilot
+git pull  # or upload new files
 npm install
 npm run build
+sudo systemctl restart solarautopilot
+
+# Database backup
+pg_dump -U solarautopilot solarautopilot > backup.sql
+
+# Database restore
+psql -U solarautopilot solarautopilot < backup.sql
 ```
 
-### TypeScript Errors
+## Troubleshooting
+
+### Service won't start
 ```bash
-npm run lint
-npm run lint -- --fix
+sudo journalctl -u solarautopilot -n 50
 ```
 
-## 📊 Performance
-
-### Lighthouse Scores (Target)
-- Performance: 90+
-- Accessibility: 95+
-- Best Practices: 95+
-- SEO: 100
-
-### Optimization Tips
-- Images are optimized (Next.js Image)
-- Code splitting enabled
-- Lazy loading for sections
-- Minimal JavaScript
-- CSS optimized (Tailwind)
-
-## 🔒 Security
-
-### Before Deploying
-- [ ] Update all download URLs
-- [ ] Test all external links
-- [ ] Verify email addresses
-- [ ] Check GitHub links
-- [ ] Test contact forms
-- [ ] Enable HTTPS
-- [ ] Add security headers
-
-## 📈 Analytics (Optional)
-
-Add Google Analytics:
-```typescript
-// app/layout.tsx
-<Script src="https://www.googletagmanager.com/gtag/js?id=GA_ID" />
-```
-
-## 🎉 You're Ready!
-
-Your website includes:
-- ✅ 19 comprehensive sections
-- ✅ 8 new advanced components
-- ✅ 50+ documentation pages
-- ✅ 30+ code examples
-- ✅ Complete API documentation
-- ✅ Multi-platform downloads
-- ✅ User guides
-- ✅ Installation instructions
-- ✅ Community section
-- ✅ Professional design
-- ✅ Mobile responsive
-- ✅ SEO optimized
-
-## 🚀 Deploy Now!
-
+### Database connection error
 ```bash
-# Final check
-npm run build
+# Check PostgreSQL is running
+sudo systemctl status postgresql
 
-# Deploy to Vercel
-vercel deploy --prod
-
-# Or deploy to your preferred platform
+# Test connection
+psql -U solarautopilot -d solarautopilot -h localhost
 ```
 
-## 📞 Support
+### Nginx errors
+```bash
+sudo nginx -t
+sudo tail -f /var/log/nginx/solarautopilot-error.log
+```
 
-If you need help:
-1. Check QUICKSTART.md
-2. Review CHANGELOG.md
-3. Read component documentation
-4. Test locally first
-5. Check browser console for errors
+### Permission issues
+```bash
+sudo chown -R www-data:www-data /var/www/solarautopilot
+sudo chmod -R 755 /var/www/solarautopilot
+```
 
-## 🌟 Next Steps
+## Performance Optimization
 
-After deployment:
-1. Test all links
-2. Verify downloads work
-3. Check mobile responsiveness
-4. Test on different browsers
-5. Monitor analytics
-6. Gather user feedback
-7. Iterate and improve
+### Enable Nginx caching
+Already configured in nginx.conf for static files
+
+### Enable compression
+Add to nginx.conf:
+```nginx
+gzip on;
+gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+```
+
+### PM2 Alternative (Optional)
+Instead of systemd, you can use PM2:
+```bash
+npm install -g pm2
+pm2 start npm --name "solarautopilot" -- start
+pm2 startup
+pm2 save
+```
+
+## Security Checklist
+
+- ✅ SSL certificate installed
+- ✅ Firewall configured
+- ✅ Strong admin password set
+- ✅ Database password secured
+- ✅ NEXTAUTH_SECRET generated randomly
+- ✅ File upload size limited (500MB in nginx.conf)
+- ✅ Security headers enabled
+- ✅ Regular backups scheduled
+
+## Support
+
+For issues, check:
+- Application logs: `sudo journalctl -u solarautopilot -f`
+- Nginx logs: `/var/log/nginx/solarautopilot-error.log`
+- Database logs: `/var/log/postgresql/`
 
 ---
 
-**Congratulations! Your advanced SolarAutopilot website is ready to launch! 🎉**
-
-Built with ❤️ for CARBONOZ SolarAutopilot
+**Your website is now live at https://yourdomain.com** 🚀
